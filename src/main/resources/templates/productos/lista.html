@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario | Productos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/inventario.css}">
+</head>
+<body>
+<!-- Header -->
+<div th:replace="~{fragments/header :: header}"></div>
+<main class="page-shell mt-4" th:with="isAdmin=${#request.isUserInRole('ROLE_ADMIN')}">
+    <section class="hero-panel">
+        <div>
+            <p class="eyebrow">Inventario</p>
+            <h1>Productos registrados</h1>
+            <p class="hero-copy" th:if="${isAdmin}">Administra tu inventario en PostgreSQL con altas, ediciones y eliminaciones desde una interfaz simple.</p>
+            <p class="hero-copy" th:unless="${isAdmin}">Consulta el inventario en modo de solo lectura.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a th:if="${isAdmin}" class="btn btn-outline-light btn-lg" th:href="@{/main}">Menu</a>
+            <a th:if="${isAdmin}" class="btn btn-light btn-lg" th:href="@{/productos/nuevo}">Nuevo producto</a>
+        </div>
+    </section>
+
+    <div class="container px-0 mt-4 centered-card">
+        <div th:if="${mensaje}" class="alert alert-success shadow-sm" th:text="${mensaje}"></div>
+
+        <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="p-3 d-flex justify-content-between align-items-center border-bottom">
+                        <div class="d-flex gap-2 align-items-center">
+                            <input id="searchInput" type="search" class="form-control form-control-sm" placeholder="Buscar por nombre o categoría">
+                        </div>
+                        <div>
+                            <button id="viewTableBtn" class="btn btn-sm btn-outline-primary me-2">Tabla</button>
+                            <button id="viewGridBtn" class="btn btn-sm btn-outline-secondary">Tarjetas</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive view-table">
+                        <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Categoría</th>
+                            <th class="text-end">Cantidad</th>
+                            <th class="text-end">Precio</th>
+                            <th th:if="${isAdmin}" class="text-end">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(productos)}">
+                            <td th:colspan="${isAdmin} ? 6 : 5" class="text-center py-5 text-muted">No hay productos registrados todavía.</td>
+                        </tr>
+                        <tr th:each="producto : ${productos}">
+                            <td class="fw-semibold" th:text="${producto.nombre}">Producto</td>
+                            <td th:text="${producto.descripcion}">Descripción</td>
+                            <td th:text="${producto.categoria}">Categoría</td>
+                            <td class="text-end" th:text="${producto.cantidad}">0</td>
+                            <td class="text-end" th:text="${#numbers.formatDecimal(producto.precio, 1, 'POINT', 2, 'COMMA')}">$0.00</td>
+                            <td th:if="${isAdmin}" class="text-end">
+                                <div class="d-inline-flex gap-2">
+                                    <a class="btn btn-outline-primary btn-sm" th:href="@{/productos/{id}/editar(id=${producto.id})}">Editar</a>
+                                    <form th:action="@{/productos/{id}/eliminar(id=${producto.id})}" method="post" onsubmit="return confirm('¿Eliminar este producto?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Grid view -->
+                <div class="view-grid p-3 d-none">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-lg-4" th:each="producto : ${productos}">
+                            <div class="card product-card h-100">
+                                <div class="card-body d-flex flex-column p-3">
+                                    <h5 class="card-title mb-1" th:text="${producto.nombre}">Nombre</h5>
+                                    <p class="card-text text-muted small mb-2 product-category" th:text="${producto.categoria}">Categoría</p>
+                                    <p class="card-text mb-3 product-desc" th:text="${producto.descripcion}">Descripción breve del producto</p>
+
+                                    <div class="mt-auto d-flex justify-content-between align-items-center product-meta">
+                                        <div class="product-qty">
+                                            <div class="text-muted small">Cantidad</div>
+                                            <div class="fw-bold" th:text="${producto.cantidad}">0</div>
+                                        </div>
+                                        <div class="text-end product-price">
+                                            <div class="text-muted small">Precio</div>
+                                            <div class="fw-bold" th:text="${#numbers.formatDecimal(producto.precio, 1, 'POINT', 2, 'COMMA')}">$0.00</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-3 d-flex gap-2">
+                                        <a th:if="${isAdmin}" class="btn btn-sm btn-outline-primary rounded-pill px-3" th:href="@{/productos/{id}/editar(id=${producto.id})}">Editar</a>
+                                        <form th:if="${isAdmin}" th:action="@{/productos/{id}/eliminar(id=${producto.id})}" method="post" onsubmit="return confirm('¿Eliminar este producto?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+    <script>
+        (function(){
+            const searchInput = document.getElementById('searchInput');
+            const searchNav = document.getElementById('searchInputNav');
+            const viewTableBtn = document.getElementById('viewTableBtn');
+            const viewGridBtn = document.getElementById('viewGridBtn');
+            const viewTable = document.querySelector('.view-table');
+            const viewGrid = document.querySelector('.view-grid');
+
+            function setView(view) {
+                if(view === 'grid'){
+                    viewGrid.classList.remove('d-none');
+                    viewGrid.style.display = 'block';
+                    viewTable.classList.add('d-none');
+                } else {
+                    viewGrid.classList.add('d-none');
+                    viewGrid.style.display = 'none';
+                    viewTable.classList.remove('d-none');
+                }
+            }
+
+            viewGridBtn.addEventListener('click', ()=> setView('grid'));
+            viewTableBtn.addEventListener('click', ()=> setView('table'));
+
+            // sync nav search and local search
+            [searchInput, searchNav].forEach(inp => {
+                if(!inp) return;
+                inp.addEventListener('input', ()=>{
+                    const q = (searchInput.value || searchNav.value || '').toLowerCase();
+                    // filter table rows
+                    document.querySelectorAll('.view-table tbody tr[th\:each]').forEach(()=>{});
+                    // simple filtering for table rows
+                    document.querySelectorAll('.view-table tbody tr').forEach(row=>{
+                        if(row.querySelectorAll('td').length===0) return;
+                        const text = row.innerText.toLowerCase();
+                        row.style.display = text.includes(q) ? '' : 'none';
+                    });
+                    // filter grid cards
+                    document.querySelectorAll('.view-grid .product-card').forEach(card=>{
+                        const text = card.innerText.toLowerCase();
+                        card.closest('.col-12').style.display = text.includes(q) ? '' : 'none';
+                    });
+                });
+            });
+
+            // wire toggle in header
+            const toggleViewBtn = document.getElementById('toggleViewBtn');
+            if(toggleViewBtn){
+                toggleViewBtn.addEventListener('click', (e)=>{
+                    e.preventDefault();
+                    const isTable = !viewGrid.classList.contains('d-none');
+                    setView(isTable ? 'table' : 'grid');
+                    toggleViewBtn.textContent = isTable ? 'Tabla' : 'Tarjetas';
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

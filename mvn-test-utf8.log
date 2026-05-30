@@ -1,0 +1,162 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------------< com.pragma:Inventario >------------------------
+[INFO] Building  0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ Inventario ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 9 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ Inventario ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ Inventario ---
+[INFO] skip non existing resourceDirectory C:\Users\LENOVO LOQ\Downloads\Inventario\Inventario\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ Inventario ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.5:test (default-test) @ Inventario ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.pragma.Inventario.InventarioApplicationTests
+20:40:30.369 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.pragma.Inventario.InventarioApplicationTests]: InventarioApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:40:30.522 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.pragma.Inventario.InventarioApplication for test class com.pragma.Inventario.InventarioApplicationTests
+20:40:30.615 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.pragma.Inventario.InventarioApplicationTests]: InventarioApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20:40:30.617 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.pragma.Inventario.InventarioApplication for test class com.pragma.Inventario.InventarioApplicationTests
+20:40:30.737 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.6)
+
+2026-05-29T20:40:31.011-05:00  INFO 32428 --- [Inventario] [           main] c.p.I.InventarioApplicationTests         : Starting InventarioApplicationTests using Java 25.0.3 with PID 32428 (started by LENOVO LOQ in C:\Users\LENOVO LOQ\Downloads\Inventario\Inventario)
+2026-05-29T20:40:31.012-05:00  INFO 32428 --- [Inventario] [           main] c.p.I.InventarioApplicationTests         : No active profile set, falling back to 1 default profile: "default"
+2026-05-29T20:40:31.891-05:00  INFO 32428 --- [Inventario] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-29T20:40:31.981-05:00  INFO 32428 --- [Inventario] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 78 ms. Found 2 JPA repository interfaces.
+2026-05-29T20:40:32.553-05:00  INFO 32428 --- [Inventario] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-05-29T20:40:32.801-05:00  INFO 32428 --- [Inventario] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.12.Final
+2026-05-29T20:40:35.353-05:00  INFO 32428 --- [Inventario] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-29T20:40:35.490-05:00  INFO 32428 --- [Inventario] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-29T20:40:36.281-05:00  INFO 32428 --- [Inventario] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:inventario_test user=SA
+2026-05-29T20:40:36.288-05:00  INFO 32428 --- [Inventario] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-29T20:40:36.546-05:00  INFO 32428 --- [Inventario] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:inventario_test]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: INVENTARIO_TEST/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-05-29T20:40:39.919-05:00  INFO 32428 --- [Inventario] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    drop table if exists productos cascade 
+Hibernate: 
+    drop table if exists usuarios cascade 
+Hibernate: 
+    create table productos (
+        cantidad integer not null,
+        precio numeric(14,2) not null,
+        id bigint generated by default as identity,
+        categoria varchar(80),
+        nombre varchar(120) not null,
+        descripcion varchar(500),
+        primary key (id)
+    )
+Hibernate: 
+    create table usuarios (
+        id bigint generated by default as identity,
+        contrasena varchar(255) not null,
+        nombre varchar(255) not null unique,
+        rol varchar(255) not null,
+        primary key (id)
+    )
+2026-05-29T20:40:40.095-05:00  INFO 32428 --- [Inventario] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-29T20:40:40.678-05:00  INFO 32428 --- [Inventario] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-29T20:40:45.189-05:00  INFO 32428 --- [Inventario] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-05-29T20:40:47.639-05:00  INFO 32428 --- [Inventario] [           main] c.p.I.InventarioApplicationTests         : Started InventarioApplicationTests in 16.92 seconds (process running for 18.067)
+Hibernate: 
+    select
+        ue1_0.id 
+    from
+        usuarios ue1_0 
+    where
+        ue1_0.nombre=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    insert 
+    into
+        usuarios
+        (contrasena, nombre, rol, id) 
+    values
+        (?, ?, ?, default)
+Hibernate: 
+    select
+        ue1_0.id 
+    from
+        usuarios ue1_0 
+    where
+        ue1_0.nombre=? 
+    fetch
+        first ? rows only
+Hibernate: 
+    insert 
+    into
+        usuarios
+        (contrasena, nombre, rol, id) 
+    values
+        (?, ?, ?, default)
+mvn : Mockito is currently self-attaching to enable the inline-mock-maker. 
+This will no longer work in future releases of the JDK. Please add Mockito as 
+an agent to your build as described in Mockito's documentation: https://javadoc
+.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.
+3
+En línea: 1 Carácter: 69
++ ... OQ\Downloads\Inventario\Inventario'; mvn test *> mvn-test.log; exit $ ...
++                                          ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Mockito is curr...ockito.html#0.3 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader 
+classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (C:\Users\LENOVO LOQ\.m2\repo
+sitory\net\bytebuddy\byte-buddy-agent\1.17.8\byte-buddy-agent-1.17.8.jar)
+WARNING: If a serviceability tool is in use, please run with 
+-XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with 
+-Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future 
+release
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 19.57 s -- in com.pragma.Inventario.InventarioApplicationTests
+[INFO] Running com.pragma.Inventario.producto.application.service.ProductoApplicationServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.618 s -- in com.pragma.Inventario.producto.application.service.ProductoApplicationServiceTest
+[INFO] Running com.pragma.Inventario.security.application.service.UserManagementServiceTest
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.439 s -- in com.pragma.Inventario.security.application.service.UserManagementServiceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  24.004 s
+[INFO] Finished at: 2026-05-29T20:40:50-05:00
+[INFO] ------------------------------------------------------------------------
+
