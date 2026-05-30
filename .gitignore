@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local test logs
+mvn-test.log
+mvn-test-utf8.log
