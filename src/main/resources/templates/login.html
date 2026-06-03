@@ -8,18 +8,43 @@
     <link rel="stylesheet" th:href="@{/css/inventario.css}" />
 </head>
 <body>
-<div th:replace="~{fragments/header :: header}"></div>
 <main class="auth-page">
-    <section class="auth-card card">
+    <section class="auth-shell w-100">
+        <div class="auth-hero hero-panel hero-panel--compact w-100">
+            <div>
+                <p class="eyebrow">Acceso</p>
+                <h1 class="auth-title">Iniciar sesión</h1>
+                <p class="auth-copy mb-0">Ingresa a una consola de inventario con una interfaz clara, corporativa y unificada.</p>
+                <div class="hero-chip-row mt-4">
+                    <span class="hero-chip">Seguridad centralizada</span>
+                    <span class="hero-chip">Panel ejecutivo</span>
+                    <span class="hero-chip">Inventario en tiempo real</span>
+                </div>
+            </div>
+            <div class="auth-hero__aside">
+                <div class="auth-hero__metric">
+                    <span class="auth-hero__metric-label">Acceso</span>
+                    <span class="auth-hero__metric-value">Seguro</span>
+                </div>
+                <p class="auth-hero__note mb-0">La sesión conserva el mismo estilo visual del resto de la aplicación.</p>
+            </div>
+        </div>
+
+        <section class="auth-card card mt-4">
         <div class="card-body p-4 p-md-5">
-            <p class="eyebrow text-primary">Acceso</p>
-            <h1 class="auth-title">Iniciar sesión</h1>
-            <p class="auth-copy mb-4">Usa tus credenciales para administrar productos, usuarios y el panel principal.</p>
+            <div class="auth-card__header mb-4">
+                <div>
+                    <p class="main-action-kicker mb-2">Consola</p>
+                    <h2 class="h4 mb-1">Bienvenido de nuevo</h2>
+                    <p class="auth-copy mb-0">Usa tus credenciales para administrar productos, usuarios y el panel principal.</p>
+                </div>
+                <span class="badge rounded-pill text-bg-light border px-3 py-2">Login protegido</span>
+            </div>
 
             <div th:if="${error}" class="error" th:text="${error}"></div>
             <div th:if="${message}" class="message" th:text="${message}"></div>
 
-            <form th:action="@{/login}" method="post" class="row g-3">
+            <form th:action="@{/login}" method="post" class="row g-4">
                 <div class="col-12">
                     <label for="username" class="form-label">Usuario</label>
                     <input type="text" id="username" name="username" class="form-control" placeholder="Ingresa tu usuario" required />
@@ -33,6 +58,7 @@
                 </div>
             </form>
         </div>
+    </section>
     </section>
 </main>
 </body>

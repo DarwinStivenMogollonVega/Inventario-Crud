@@ -8,14 +8,17 @@ import org.springframework.stereotype.Component;
 
 import com.pragma.Inventario.producto.application.ports.out.ProductoRepositoryPort;
 import com.pragma.Inventario.producto.domain.model.Producto;
+import com.pragma.Inventario.shared.audit.AuditService;
 
 @Component
 public class JpaProductoRepositoryAdapter implements ProductoRepositoryPort {
 
     private final SpringDataProductoRepository springDataProductoRepository;
+    private final AuditService auditService;
 
-    public JpaProductoRepositoryAdapter(SpringDataProductoRepository springDataProductoRepository) {
+    public JpaProductoRepositoryAdapter(SpringDataProductoRepository springDataProductoRepository, AuditService auditService) {
         this.springDataProductoRepository = springDataProductoRepository;
+        this.auditService = auditService;
     }
 
     @Override
@@ -33,13 +36,22 @@ public class JpaProductoRepositoryAdapter implements ProductoRepositoryPort {
 
     @Override
     public Producto save(Producto producto) {
+        boolean isCreate = producto.getId() == null;
         ProductoEntity savedEntity = springDataProductoRepository.save(toEntity(producto));
+        // record audit
+        String details = String.format("nombre=%s,cantidad=%d,precio=%s,categoria=%s",
+                savedEntity.getNombre(), savedEntity.getCantidad(), savedEntity.getPrecio(), savedEntity.getCategoria());
+        auditService.record("Producto", savedEntity.getId(), isCreate ? "CREATE" : "UPDATE", details);
         return toDomain(savedEntity);
     }
 
     @Override
     public void delete(Producto producto) {
-        springDataProductoRepository.delete(toEntity(producto));
+        ProductoEntity entity = toEntity(producto);
+        springDataProductoRepository.delete(entity);
+        String details = String.format("nombre=%s,cantidad=%d,precio=%s,categoria=%s",
+                entity.getNombre(), entity.getCantidad(), entity.getPrecio(), entity.getCategoria());
+        auditService.record("Producto", producto.getId(), "DELETE", details);
     }
 
     private Producto toDomain(ProductoEntity entity) {

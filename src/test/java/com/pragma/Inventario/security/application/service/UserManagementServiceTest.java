@@ -17,11 +17,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.pragma.Inventario.security.application.exception.UserAlreadyExistsException;
-import com.pragma.Inventario.security.application.exception.UserNotFoundException;
+import com.pragma.Inventario.infrastructure.adapters.in.web.ResourceNotFoundException;
 import com.pragma.Inventario.security.application.ports.out.PasswordHasherPort;
 import com.pragma.Inventario.security.application.ports.out.UserRepositoryPort;
 import com.pragma.Inventario.security.domain.model.User;
+import com.pragma.Inventario.security.infrastructure.adapters.in.web.UserAlreadyExistsException;
 
 @ExtendWith(MockitoExtension.class)
 class UserManagementServiceTest {
@@ -64,7 +64,7 @@ class UserManagementServiceTest {
     void findRequiredByIdShouldThrowWhenUserDoesNotExist() {
         when(userRepositoryPort.findById(40L)).thenReturn(Optional.empty());
 
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> userManagementService.findRequiredById(40L));
 
         assertEquals("Usuario no encontrado", exception.getMessage());
@@ -175,7 +175,7 @@ class UserManagementServiceTest {
     void deleteUserByIdShouldThrowWhenUserDoesNotExist() {
         when(userRepositoryPort.findById(16L)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userManagementService.deleteUserById(16L));
+        assertThrows(ResourceNotFoundException.class, () -> userManagementService.deleteUserById(16L));
 
         verify(userRepositoryPort).findById(16L);
         verify(userRepositoryPort, never()).deleteById(16L);

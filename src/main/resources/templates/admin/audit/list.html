@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>Auditoría - Entradas</title>
+    <th:block th:replace="fragments/header :: head"></th:block>
+    <link rel="stylesheet" th:href="@{/css/inventario.css}" />
+</head>
+<body>
+<th:block th:replace="fragments/header :: header"></th:block>
+
+<div class="container mt-4">
+    <h1>Registro de auditoría</h1>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Entidad</th>
+                <th>ID</th>
+                <th>Detalles</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="e : ${entries}">
+                <td th:text="${#temporals.format(e.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td th:text="${e.username}"></td>
+                <td th:text="${e.action}"></td>
+                <td th:text="${e.entityType}"></td>
+                <td th:text="${e.entityId}"></td>
+                <td><pre th:text="${e.details}"></pre></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<th:block th:replace="fragments/footer :: footer"></th:block>
+</body>
+</html>

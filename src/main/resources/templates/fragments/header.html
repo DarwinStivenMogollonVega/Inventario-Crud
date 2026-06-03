@@ -49,6 +49,11 @@
                             </form>
                         </div>
 
+                        <button id="themeToggleBtn" type="button" class="btn btn-outline-secondary me-2" aria-pressed="false">
+                            <span class="theme-toggle__icon" aria-hidden="true">◐</span>
+                            <span class="theme-toggle__label">Tema</span>
+                        </button>
+
                         <a th:if="${#request.userPrincipal == null}" class="btn btn-outline-primary" th:href="@{/login}">Iniciar sesión</a>
                     </div>
                 </div>
@@ -56,5 +61,42 @@
         </nav>
     </th:block>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function () {
+            const storageKey = 'inventario-theme';
+            const root = document.documentElement;
+            const button = document.getElementById('themeToggleBtn');
+
+            function getPreferredTheme() {
+                const saved = window.localStorage.getItem(storageKey);
+                if (saved === 'light' || saved === 'dark') {
+                    return saved;
+                }
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function applyTheme(theme) {
+                root.setAttribute('data-theme', theme);
+                root.setAttribute('data-bs-theme', theme);
+                window.localStorage.setItem(storageKey, theme);
+
+                if (button) {
+                    const isDark = theme === 'dark';
+                    button.setAttribute('aria-pressed', String(isDark));
+                    button.innerHTML = isDark
+                        ? '<span class="theme-toggle__icon" aria-hidden="true">☼</span><span class="theme-toggle__label">Claro</span>'
+                        : '<span class="theme-toggle__icon" aria-hidden="true">◐</span><span class="theme-toggle__label">Oscuro</span>';
+                }
+            }
+
+            applyTheme(getPreferredTheme());
+
+            if (button) {
+                button.addEventListener('click', function () {
+                    applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+                });
+            }
+        })();
+    </script>
 </head>
 </html>
