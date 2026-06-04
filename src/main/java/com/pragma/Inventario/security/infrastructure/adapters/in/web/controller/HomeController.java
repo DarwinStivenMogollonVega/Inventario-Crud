@@ -1,7 +1,6 @@
 package com.pragma.Inventario.security.infrastructure.adapters.in.web.controller;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
