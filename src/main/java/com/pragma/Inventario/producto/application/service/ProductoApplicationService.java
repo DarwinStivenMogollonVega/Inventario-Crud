@@ -4,10 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.pragma.Inventario.producto.application.exception.ProductNotFoundException;
 import com.pragma.Inventario.producto.application.ports.in.ProductoUseCase;
 import com.pragma.Inventario.producto.application.ports.out.ProductoRepositoryPort;
 import com.pragma.Inventario.producto.domain.model.Producto;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ProductoApplicationService implements ProductoUseCase {
@@ -26,7 +27,7 @@ public class ProductoApplicationService implements ProductoUseCase {
     @Override
     public Producto findRequiredById(Long id) {
         return productoRepositoryPort.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("No se encontro el producto con id " + id));
+                .orElseThrow(() -> new EntityNotFoundException("No se encontro el producto con id " + id));
     }
 
     @Override

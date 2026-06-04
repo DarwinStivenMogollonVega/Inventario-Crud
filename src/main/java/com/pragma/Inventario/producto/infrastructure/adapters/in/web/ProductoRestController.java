@@ -2,6 +2,7 @@ package com.pragma.Inventario.producto.infrastructure.adapters.in.web;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pragma.Inventario.producto.application.ports.in.ProductoUseCase;
-import com.pragma.Inventario.producto.infrastructure.adapters.in.rest.dto.request.CreateProductRequest;
-import com.pragma.Inventario.producto.infrastructure.adapters.in.rest.dto.request.UpdateProductRequest;
-import com.pragma.Inventario.producto.infrastructure.adapters.in.rest.dto.response.ProductResponse;
-import com.pragma.Inventario.producto.infrastructure.adapters.mapper.ProductoMapper;
+import com.pragma.Inventario.producto.domain.model.Producto;
+import com.pragma.Inventario.producto.infrastructure.adapters.in.web.form.ProductoForm;
 
 import jakarta.validation.Valid;
 
@@ -26,36 +25,35 @@ import jakarta.validation.Valid;
 public class ProductoRestController {
 
     private final ProductoUseCase productoUseCase;
-    private final ProductoMapper productoMapper;
 
-    public ProductoRestController(ProductoUseCase productoUseCase, ProductoMapper productoMapper) {
+    public ProductoRestController(ProductoUseCase productoUseCase) {
         this.productoUseCase = productoUseCase;
-        this.productoMapper = productoMapper;
     }
 
     @GetMapping
-    public List<ProductResponse> listProducts() {
+    public List<ProductoForm> listProducts() {
         return productoUseCase.findAllOrderedByName().stream()
-                .map(productoMapper::toResponse)
-                .toList();
+                .map(ProductoForm::from)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ProductResponse getProduct(@PathVariable Long id) {
-        return productoMapper.toResponse(productoUseCase.findRequiredById(id));
+    public ProductoForm getProduct(@PathVariable Long id) {
+        return ProductoForm.from(productoUseCase.findRequiredById(id));
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody CreateProductRequest request) {
-        var creado = productoUseCase.saveProduct(productoMapper.toDomain(request));
-        return ResponseEntity.created(URI.create("/api/productos/" + creado.getId())).body(productoMapper.toResponse(creado));
+    public ResponseEntity<ProductoForm> createProduct(@Valid @RequestBody ProductoForm productoForm) {
+        Producto creado = productoUseCase.saveProduct(productoForm.toDomain());
+        return ResponseEntity.created(URI.create("/api/productos/" + creado.getId())).body(ProductoForm.from(creado));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest request) {
+    public ResponseEntity<ProductoForm> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductoForm productoForm) {
         productoUseCase.findRequiredById(id);
-        var actualizado = productoUseCase.saveProduct(productoMapper.toDomain(request, id));
-        return ResponseEntity.ok(productoMapper.toResponse(actualizado));
+        productoForm.setId(id);
+        Producto actualizado = productoUseCase.saveProduct(productoForm.toDomain());
+        return ResponseEntity.ok(ProductoForm.from(actualizado));
     }
 
     @DeleteMapping("/{id}")

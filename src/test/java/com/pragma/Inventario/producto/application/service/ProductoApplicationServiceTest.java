@@ -17,7 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.pragma.Inventario.producto.application.exception.ProductNotFoundException;
+import com.pragma.Inventario.infrastructure.adapters.in.web.ResourceNotFoundException;
 import com.pragma.Inventario.producto.application.ports.out.ProductoRepositoryPort;
 import com.pragma.Inventario.producto.domain.model.Producto;
 
@@ -59,7 +59,7 @@ class ProductoApplicationServiceTest {
     void findRequiredByIdShouldThrowWhenProductDoesNotExist() {
         when(productoRepositoryPort.findById(99L)).thenReturn(Optional.empty());
 
-        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> productoApplicationService.findRequiredById(99L));
 
         assertEquals("No se encontro el producto con id 99", exception.getMessage());
@@ -93,7 +93,7 @@ class ProductoApplicationServiceTest {
     void deleteProductByIdShouldThrowWhenProductDoesNotExist() {
         when(productoRepositoryPort.findById(12L)).thenReturn(Optional.empty());
 
-        assertThrows(ProductNotFoundException.class, () -> productoApplicationService.deleteProductById(12L));
+        assertThrows(ResourceNotFoundException.class, () -> productoApplicationService.deleteProductById(12L));
 
         verify(productoRepositoryPort).findById(12L);
         verify(productoRepositoryPort, never()).delete(any(Producto.class));

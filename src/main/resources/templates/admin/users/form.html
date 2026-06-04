@@ -14,14 +14,32 @@
         <div>
             <p class="eyebrow">Administración</p>
             <h1 th:text="${user.id} == null ? 'Crear usuario' : 'Editar usuario'">Crear usuario</h1>
-            <p class="hero-copy">Define el usuario, la contraseña y el rol para controlar el acceso al sistema.</p>
+            <p class="hero-copy">Gestiona acceso y permisos con una interfaz clara, sobria y alineada con el resto de la aplicación.</p>
+            <div class="hero-chip-row mt-4">
+                <span class="hero-chip">Seguridad</span>
+                <span class="hero-chip" th:text="${user.id} == null ? 'Alta de usuario' : 'Actualización'">Alta de usuario</span>
+                <span class="hero-chip">Acceso por rol</span>
+            </div>
         </div>
-        <a class="btn btn-outline-light btn-lg" th:href="@{/admin/users}">Volver</a>
+        <div class="d-flex flex-wrap gap-2 justify-content-end">
+            <span class="hero-chip">Campos protegidos</span>
+            <a class="btn btn-outline-light btn-lg" th:href="@{/admin/users}">Volver</a>
+        </div>
     </section>
 
-    <section class="card form-card centered-card mt-4">
+    <section class="card form-card form-card--executive centered-card mt-4">
         <div class="card-body p-4 p-md-5">
-            <form th:action="${user.id == null} ? @{/admin/users} : @{/admin/users/{id}(id=${user.id})}" th:object="${user}" method="post" class="row g-3">
+            <form th:action="${user.id == null} ? @{/admin/users} : @{/admin/users/{id}(id=${user.id})}" th:object="${user}" method="post" class="row g-4">
+                <div class="col-12">
+                    <div class="form-section">
+                        <div class="form-section__header">
+                            <p class="main-action-kicker mb-2">Seguridad</p>
+                            <h2 class="h5 mb-1">Datos de acceso</h2>
+                            <p class="form-help mb-0">El rol define qué partes de la consola puede ver el usuario.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-12">
                     <label class="form-label">Username</label>
                     <input class="form-control" th:field="*{username}" placeholder="ej. maria" />

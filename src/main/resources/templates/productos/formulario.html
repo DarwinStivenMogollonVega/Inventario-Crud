@@ -15,15 +15,33 @@
         <div>
             <p class="eyebrow">Inventario</p>
             <h1 th:text="${titulo}">Formulario</h1>
-            <p class="hero-copy">Completa los campos para registrar o actualizar un producto.</p>
+            <p class="hero-copy">Completa los campos para registrar o actualizar un producto con una presentación más limpia y consistente.</p>
+            <div class="hero-chip-row mt-4">
+                <span class="hero-chip">Producto</span>
+                <span class="hero-chip" th:text="${producto.id} == null ? 'Nuevo registro' : 'Edición'">Nuevo registro</span>
+                <span class="hero-chip">Inventario central</span>
+            </div>
         </div>
-        <a class="btn btn-outline-light btn-lg" th:href="@{/productos}">Volver</a>
+        <div class="d-flex flex-wrap gap-2 justify-content-end">
+            <span class="hero-chip">Campos obligatorios</span>
+            <a class="btn btn-outline-light btn-lg" th:href="@{/productos}">Volver</a>
+        </div>
     </section>
 
-    <div class="card form-card mt-4 centered-card">
+    <div class="card form-card form-card--executive mt-4 centered-card">
         <div class="card-body p-4 p-md-5">
-            <form th:action="@{/productos/guardar}" th:object="${producto}" method="post" class="row g-3">
+            <form th:action="@{/productos/guardar}" th:object="${producto}" method="post" class="row g-4">
                 <input type="hidden" th:field="*{id}">
+
+                <div class="col-12">
+                    <div class="form-section">
+                        <div class="form-section__header">
+                            <p class="main-action-kicker mb-2">Información principal</p>
+                            <h2 class="h5 mb-1">Datos del producto</h2>
+                            <p class="form-help mb-0">Usa nombres claros y descripciones breves para facilitar la búsqueda.</p>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="col-12">
                     <label class="form-label" for="nombre">Nombre</label>

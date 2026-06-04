@@ -9,8 +9,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String redirectToInventory(Authentication authentication) {
-        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
-        return isAdmin ? "redirect:/main" : "redirect:/productos";
+        return "redirect:/main";
     }
 }

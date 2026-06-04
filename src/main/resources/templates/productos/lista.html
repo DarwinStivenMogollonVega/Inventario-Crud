@@ -10,68 +10,114 @@
 <body>
 <!-- Header -->
 <div th:replace="~{fragments/header :: header}"></div>
-<main class="page-shell mt-4" th:with="isAdmin=${#request.isUserInRole('ROLE_ADMIN')}">
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<main class="page-shell mt-4">
     <section class="hero-panel">
         <div>
             <p class="eyebrow">Inventario</p>
             <h1>Productos registrados</h1>
-            <p class="hero-copy" th:if="${isAdmin}">Administra tu inventario en PostgreSQL con altas, ediciones y eliminaciones desde una interfaz simple.</p>
-            <p class="hero-copy" th:unless="${isAdmin}">Consulta el inventario en modo de solo lectura.</p>
+            <p class="hero-copy" sec:authorize="hasRole('ADMIN')">Administración ejecutiva del inventario: búsqueda, filtros, orden y paginación en una vista limpia y operativa.</p>
+            <p class="hero-copy" sec:authorize="!hasRole('ADMIN')">Consulta ejecutiva del inventario con búsqueda, filtros y una lectura clara de los productos disponibles.</p>
         </div>
-        <div class="d-flex flex-wrap gap-2">
-            <a th:if="${isAdmin}" class="btn btn-outline-light btn-lg" th:href="@{/main}">Menu</a>
-            <a th:if="${isAdmin}" class="btn btn-light btn-lg" th:href="@{/productos/nuevo}">Nuevo producto</a>
+        <div class="d-flex flex-wrap gap-2 justify-content-end">
+            <span class="hero-chip">Filtros activos</span>
+            <span class="hero-chip" th:text="${totalItems} + ' resultados'">0 resultados</span>
+            <a sec:authorize="hasRole('ADMIN')" class="btn btn-outline-light btn-lg" th:href="@{/main}">Menu</a>
+            <a sec:authorize="hasRole('ADMIN')" class="btn btn-light btn-lg" th:href="@{/productos/nuevo}">Nuevo producto</a>
         </div>
     </section>
 
     <div class="container px-0 mt-4 centered-card">
         <div th:if="${mensaje}" class="alert alert-success shadow-sm" th:text="${mensaje}"></div>
 
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0 executive-list-card">
                 <div class="card-body p-0">
-                    <div class="p-3 d-flex justify-content-between align-items-center border-bottom">
-                        <div class="d-flex gap-2 align-items-center">
-                            <input id="searchInput" type="search" class="form-control form-control-sm" placeholder="Buscar por nombre o categoría">
+                    <div class="list-toolbar">
+                        <div class="list-toolbar__summary">
+                            <p class="main-action-kicker mb-2">Inventario</p>
+                            <h2 class="h5 mb-1">Exploración avanzada</h2>
+                            <p class="text-muted mb-0">Filtra por categoría, precio, stock y cambia entre tabla o tarjetas.</p>
                         </div>
-                        <div>
-                            <button id="viewTableBtn" class="btn btn-sm btn-outline-primary me-2">Tabla</button>
-                            <button id="viewGridBtn" class="btn btn-sm btn-outline-secondary">Tarjetas</button>
+                        <div class="list-toolbar__actions">
+                            <button id="viewTableBtn" type="button" class="btn btn-sm btn-outline-primary">Tabla</button>
+                            <button id="viewGridBtn" type="button" class="btn btn-sm btn-outline-secondary">Tarjetas</button>
                         </div>
                     </div>
-                    <div class="table-responsive view-table">
-                        <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th>Categoría</th>
-                            <th class="text-end">Cantidad</th>
-                            <th class="text-end">Precio</th>
-                            <th th:if="${isAdmin}" class="text-end">Acciones</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:if="${#lists.isEmpty(productos)}">
-                            <td th:colspan="${isAdmin} ? 6 : 5" class="text-center py-5 text-muted">No hay productos registrados todavía.</td>
-                        </tr>
-                        <tr th:each="producto : ${productos}">
-                            <td class="fw-semibold" th:text="${producto.nombre}">Producto</td>
-                            <td th:text="${producto.descripcion}">Descripción</td>
-                            <td th:text="${producto.categoria}">Categoría</td>
-                            <td class="text-end" th:text="${producto.cantidad}">0</td>
-                            <td class="text-end" th:text="${#numbers.formatDecimal(producto.precio, 1, 'POINT', 2, 'COMMA')}">$0.00</td>
-                            <td th:if="${isAdmin}" class="text-end">
-                                <div class="d-inline-flex gap-2">
-                                    <a class="btn btn-outline-primary btn-sm" th:href="@{/productos/{id}/editar(id=${producto.id})}">Editar</a>
-                                    <form th:action="@{/productos/{id}/eliminar(id=${producto.id})}" method="post" onsubmit="return confirm('¿Eliminar este producto?');">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
-                                    </form>
+                    <div class="list-filters">
+                        <form class="row g-3 align-items-end" method="get" action="/productos">
+                            <div class="col-12 col-lg-4">
+                                <label class="form-label small text-uppercase mb-2" for="searchInput">Buscar</label>
+                                <input id="searchInput" name="q" type="search" class="form-control" placeholder="Nombre, categoría o descripción" th:value="${q}">
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-3">
+                                <label class="form-label small text-uppercase mb-2" for="categoriaSelect">Categoría</label>
+                                <select id="categoriaSelect" name="categoria" class="form-select">
+                                    <option th:value="" th:selected="${selectedCategoria == null}">Todas las categorías</option>
+                                    <option th:each="cat : ${categorias}" th:value="${cat}" th:text="${cat}" th:selected="${cat == selectedCategoria}"></option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-3 col-lg-2">
+                                <label class="form-label small text-uppercase mb-2" for="minPriceInput">Precio min</label>
+                                <input id="minPriceInput" name="minPrice" type="number" step="0.01" class="form-control" placeholder="0.00" th:value="${minPrice}">
+                            </div>
+                            <div class="col-6 col-md-3 col-lg-2">
+                                <label class="form-label small text-uppercase mb-2" for="maxPriceInput">Precio max</label>
+                                <input id="maxPriceInput" name="maxPrice" type="number" step="0.01" class="form-control" placeholder="0.00" th:value="${maxPrice}">
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-1 list-filter-check">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="checkbox" name="lowStock" value="true" id="lowStockCheck" th:checked="${lowStock}">
+                                    <label class="form-check-label small" for="lowStockCheck">Stock bajo</label>
                                 </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-2">
+                                <label class="form-label small text-uppercase mb-2" for="sortSelect">Orden</label>
+                                <select id="sortSelect" name="sort" class="form-select">
+                                    <option th:value="name" th:selected="${sort=='name'}">Nombre</option>
+                                    <option th:value="price" th:selected="${sort=='price'}">Precio</option>
+                                    <option th:value="stock" th:selected="${sort=='stock'}">Stock</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-lg-2 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1">Filtrar</button>
+                                <a class="btn btn-outline-secondary" th:href="@{/productos}">Limpiar</a>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="table-responsive view-table">
+                        <table class="table table-hover align-middle mb-0 executive-table">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Categoría</th>
+                                <th class="text-end">Cantidad</th>
+                                <th class="text-end">Precio</th>
+                                <th class="text-end" sec:authorize="hasRole('ADMIN')">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(productos)}">
+                                <td th:colspan="6" class="text-center py-5 text-muted">No hay productos registrados todavía.</td>
+                            </tr>
+                            <tr th:each="producto : ${productos}">
+                                <td class="fw-semibold" th:text="${producto.nombre}">Producto</td>
+                                <td th:text="${producto.descripcion}">Descripción</td>
+                                <td><span class="badge rounded-pill text-bg-light border" th:text="${producto.categoria}">Categoría</span></td>
+                                <td class="text-end" th:text="${producto.cantidad}">0</td>
+                                <td class="text-end" th:text="${#numbers.formatDecimal(producto.precio, 1, 'POINT', 2, 'COMMA')}">$0.00</td>
+                                <td class="text-end" sec:authorize="hasRole('ADMIN')">
+                                    <div class="d-inline-flex gap-2">
+                                            <a class="btn btn-outline-primary btn-sm" th:href="@{/productos/{id}/editar(id=${producto.id})}">Editar</a>
+                                        <form th:action="@{/productos/{id}/eliminar(id=${producto.id})}" method="post" onsubmit="return confirm('¿Eliminar este producto?');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
                 <!-- Grid view -->
                 <div class="view-grid p-3 d-none">
@@ -95,8 +141,8 @@
                                     </div>
 
                                     <div class="mt-3 d-flex gap-2">
-                                        <a th:if="${isAdmin}" class="btn btn-sm btn-outline-primary rounded-pill px-3" th:href="@{/productos/{id}/editar(id=${producto.id})}">Editar</a>
-                                        <form th:if="${isAdmin}" th:action="@{/productos/{id}/eliminar(id=${producto.id})}" method="post" onsubmit="return confirm('¿Eliminar este producto?');">
+                                        <a sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-primary rounded-pill px-3" th:href="@{/productos/{id}/editar(id=${producto.id})}">Editar</a>
+                                        <form sec:authorize="hasRole('ADMIN')" th:action="@{/productos/{id}/eliminar(id=${producto.id})}" method="post" onsubmit="return confirm('¿Eliminar este producto?');">
                                             <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Eliminar</button>
                                         </form>
                                     </div>
@@ -107,6 +153,25 @@
                 </div>
 
             </div>
+        </div>
+    </div>
+    <!-- Pagination -->
+    <div class="container mt-3">
+        <div class="pagination-shell d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="small text-muted">Mostrando <span th:text="${(currentPage-1)*pageSize + 1}"></span> - <span th:text="${(currentPage-1)*pageSize + #lists.size(productos)}"></span> de <span th:text="${totalItems}"></span></div>
+            <nav aria-label="Paginación">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/productos(q=${q}, categoria=${selectedCategoria}, minPrice=${minPrice}, maxPrice=${maxPrice}, lowStock=${lowStock}, sort=${sort}, page=${currentPage-1})}" aria-label="Anterior">&laquo;</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/productos(q=${q}, categoria=${selectedCategoria}, minPrice=${minPrice}, maxPrice=${maxPrice}, lowStock=${lowStock}, sort=${sort}, page=${i})}" th:text="${i}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/productos(q=${q}, categoria=${selectedCategoria}, minPrice=${minPrice}, maxPrice=${maxPrice}, lowStock=${lowStock}, sort=${sort}, page=${currentPage+1})}" aria-label="Siguiente">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </main>

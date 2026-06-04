@@ -7,14 +7,17 @@ import org.springframework.stereotype.Component;
 
 import com.pragma.Inventario.security.application.ports.out.UserRepositoryPort;
 import com.pragma.Inventario.security.domain.model.User;
+import com.pragma.Inventario.shared.audit.AuditService;
 
 @Component
 public class JpaUserRepositoryAdapter implements UserRepositoryPort {
 
     private final SpringDataUserRepository springDataUserRepository;
+    private final AuditService auditService;
 
-    public JpaUserRepositoryAdapter(SpringDataUserRepository springDataUserRepository) {
+    public JpaUserRepositoryAdapter(SpringDataUserRepository springDataUserRepository, AuditService auditService) {
         this.springDataUserRepository = springDataUserRepository;
+        this.auditService = auditService;
     }
 
     @Override
@@ -44,13 +47,21 @@ public class JpaUserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public User save(User user) {
+        boolean isCreate = user.getId() == null;
         UserEntity savedEntity = springDataUserRepository.save(toEntity(user));
+        String details = String.format("username=%s,role=%s", savedEntity.getNombre(), savedEntity.getRol());
+        auditService.record("User", savedEntity.getId(), isCreate ? "CREATE" : "UPDATE", details);
         return toDomain(savedEntity);
     }
 
     @Override
     public void deleteById(Long id) {
-        springDataUserRepository.deleteById(id);
+        // fetch entity snapshot for details
+        springDataUserRepository.findById(id).ifPresent(entity -> {
+            springDataUserRepository.deleteById(id);
+            String details = String.format("username=%s,role=%s", entity.getNombre(), entity.getRol());
+            auditService.record("User", id, "DELETE", details);
+        });
     }
 
     private User toDomain(UserEntity entity) {
